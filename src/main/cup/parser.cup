@@ -1,0 +1,178 @@
+package lyc.compiler;
+import java_cup.runtime.*;
+import java.io.*;
+import java.util.List;
+import java.util.ArrayList;
+
+
+
+class Parser;
+action code{:
+    ArrayList<String> element = new ArrayList<String>();
+    int medio;
+    public void agregar_a_lista(String elem)  {
+
+            element.add(elem);
+
+        }
+
+        public int elemento_en_el_medio()  {
+                    int posicion_medio;
+                    String valor_medio;
+
+
+                     try{
+                         if((element.size() == 0) ||( element.size() % 2 == 0))
+                               { throw new Exception("Error.No hay elementos en la lista o la cantidad de elementos es par\n"); }
+                     }
+                     catch(Exception e){
+                        System.out.println(e + "  Error. No se puede obtener el valor medio \n");
+                        return 1;
+                     }
+                     posicion_medio = (element.size()/2) + 1;
+                     valor_medio = element.get(posicion_medio - 1);
+
+                       for(int i=0;i<element.size();i++)
+                        {
+
+                           if( i== 0)
+                           {
+                             System.out.print( valor_medio + " = ElementInTheMiddle(" + element.get(i)+",");
+                           }
+
+                           if(i == element.size() -1)
+                          {
+                             System.out.println(element.get(i)+")");
+                          }
+                          if((i < element.size() -1)&&(i != 0))
+                          {
+                               System.out.print(element.get(i)+ ",");
+                          }
+                        }
+                        return 0;
+       }
+
+
+
+
+
+:};
+
+
+
+// Terminals
+terminal ASSIG;
+terminal PLUS;
+terminal SUB;
+terminal MULT;
+terminal DIV;
+terminal P_A;
+terminal P_C;
+terminal String INTEGER_CONSTANT;
+terminal String REAL_CONSTANT;
+terminal STRING_CONSTANT;
+terminal String IDENTIFIER;
+terminal COMA;
+terminal PUNTO_COMA;
+terminal D_P;
+terminal CORCH_ABRE;
+terminal CORCH_CIERRA;
+terminal LL_A;
+terminal LL_C;
+terminal MENOR_IGUAL;
+terminal MENOR;
+terminal MAYOR_IGUAL;
+terminal MAYOR;
+terminal IGUAL;
+terminal AND;
+terminal OR;
+terminal NOT;
+terminal DISTINTO;
+terminal INT;
+terminal FLOAT;
+terminal STRING;
+terminal INIT;
+terminal END;
+terminal READ;
+terminal WRITE;
+terminal IF;
+terminal ELSE;
+terminal CICLO;
+terminal ELEMENT_IN_THE_MIDDLE;
+
+
+// Non Terminals
+non terminal sentence;
+non terminal assignment;
+non terminal expression;
+non terminal term;
+non terminal factor;
+non terminal condicion;
+non terminal op_comparador;
+non terminal comparacion;
+non terminal operador_logico;
+non terminal declaracion;
+non terminal lista_dec;
+non terminal dec;
+non terminal lista_variables;
+non terminal tipo_dato;
+non terminal sentencia;
+non terminal asignacion;
+non terminal ciclo;
+non terminal seleccion;
+non terminal entrada;
+non terminal salida;
+non terminal bloque;
+non terminal lista;
+non terminal elemento;
+
+
+
+// Start Symbol Definition
+start with sentence;
+
+sentence ::= declaracion END {: System.out.println("End"); :};
+declaracion ::= INIT LL_A lista_dec LL_C bloque {: System.out.println("Declaracion"); :};
+lista_dec ::= dec {: System.out.println("lista_dec"); :};
+lista_dec ::= lista_dec dec {: System.out.println("lista_dec"); :};
+dec ::= lista_variables D_P tipo_dato {: System.out.println("declaracion"); :};
+lista_variables ::= IDENTIFIER:id {: System.out.println("lista_variables    Id: " + id); :};
+lista_variables ::= lista_variables COMA IDENTIFIER:id {: System.out.println("lista_variables  ID: "+ id); :};
+tipo_dato ::= INT|FLOAT|STRING {: System.out.println("tipo_dato"); :};
+bloque ::= sentencia {: System.out.println("Bloque"); :};
+bloque ::= bloque sentencia {: System.out.println("bloque"); :};
+sentencia ::= assignment {: System.out.println("Sentencia Assignment"); :};
+sentencia ::= seleccion {: System.out.println("Seleccion"); :};
+sentencia ::= ciclo {: System.out.println("Ciclo"); :};
+sentencia ::= entrada {: System.out.println("Entrada"); :};
+sentencia ::= salida {: System.out.println("Salida"); :};
+assignment ::= IDENTIFIER ASSIG expression {: System.out.println("Assignment"); :};
+assignment ::= IDENTIFIER:id ASSIG ELEMENT_IN_THE_MIDDLE P_A lista P_C {: elemento_en_el_medio();System.out.println("Ele_Medio"); :};
+lista ::= elemento  {: System.out.println("Elemento"); :};
+lista ::= lista COMA elemento {: System.out.println("Elemento"); :};
+elemento ::= IDENTIFIER:id  {: agregar_a_lista(id); System.out.println("valor elemento"); :};
+elemento ::= INTEGER_CONSTANT:constant {: agregar_a_lista(constant); System.out.println("valor elemento"); :};
+elemento ::= REAL_CONSTANT:constant {: agregar_a_lista(constant);System.out.println("valor elemento"); :};
+seleccion ::= IF P_A condicion P_C LL_A bloque LL_C {: System.out.println("Seleccion"); :};
+seleccion ::= IF P_A condicion P_C LL_A bloque LL_C ELSE LL_A bloque LL_C {: System.out.println("Seleccion"); :};
+ciclo ::= CICLO P_A condicion P_C LL_A bloque LL_C {: System.out.println("Seleccion"); :};
+condicion ::= comparacion {: System.out.println("Condicion"); :};
+condicion ::= comparacion operador_logico comparacion {: System.out.println("Condicion"); :};
+condicion ::= NOT comparacion  {: System.out.println("Condicion"); :};
+comparacion ::= factor op_comparador factor {: System.out.println("Comparacion"); :};
+op_comparador ::= MAYOR|MAYOR_IGUAL|MENOR|MENOR_IGUAL|IGUAL|DISTINTO {: System.out.println("Op_Comparador"); :};
+operador_logico ::= AND|OR {: System.out.println("Operador Logico"); :};
+
+expression ::= expression PLUS term {: System.out.println("+"); :};
+expression ::= expression SUB term {: System.out.println("-"); :};
+expression ::= term {: System.out.println("Expression = Term"); :};
+term ::= term MULT factor {: System.out.println("*"); :};
+term ::= term DIV factor {: System.out.println("/"); :};
+term ::= factor {: System.out.println("Term = factor"); :};
+factor ::= IDENTIFIER:id  {: System.out.println("Id: " + id); :};
+factor ::= INTEGER_CONSTANT:constant {: System.out.println("Constant Integer: " + constant ); :};
+factor ::= REAL_CONSTANT:constant {: System.out.println("Constant Real : " + constant ); :};
+factor ::= STRING_CONSTANT:constant {: System.out.println("Constant String: " + constant ); :};
+factor ::= P_A expression P_C {: System.out.println("Factor = (Expression)"); :};
+entrada ::= READ P_A IDENTIFIER:id P_C {: System.out.println("Read"); :};
+salida ::= WRITE P_A STRING_CONSTANT P_C|WRITE P_A IDENTIFIER:id P_C  {: System.out.println("Write"); :};
